@@ -3,7 +3,9 @@ float lineLength = 500;
 float lineCenterX = 750;
 float lineCenterY = 500;
 float deltaAngle = PI / 256;
-float propagationDecay = 1.75;
+float propagationDecay = 1.5;
+float minAngle = 0.1*PI;
+float maxAngle = 0.3*PI;
 
 // Initial Values
 float lineAngle = 0;
@@ -16,30 +18,26 @@ void setup() {
 
 // Recursive function that draws child lines
 // angleIndex - index of the current child's angle in propogationAngles
-void propagateLine(int depth, int angleIndex, float startX, float startY) {  
-  
+void propagateLine(float parentAngle, int depth, int angleIndex, float startX, float startY) {
+  // When computing angle, negate even-indexed angles to reflect them across the parent branch
+  float compAngle = (2 * (angleIndex % 2) - 1) * propagationAngles[angleIndex] + parentAngle;
   float childLength = lineLength / pow(propagationDecay, depth);
-  float endX = startX + childLength * cos(propagationAngles[angleIndex]);
-  float endY = startY + childLength * sin(propagationAngles[angleIndex]);
-  float midX = startX + childLength * cos(propagationAngles[angleIndex]) / 2;
-  float midY = startY + childLength * sin(propagationAngles[angleIndex]) / 2;
+  float endX = startX + childLength * cos(compAngle);
+  float endY = startY + childLength * sin(compAngle);
+  float midX = startX + childLength * cos(compAngle) / 2;
+  float midY = startY + childLength * sin(compAngle) / 2;
   line(startX, startY, endX, endY);
   
-  print(angleIndex);
-  
   // update angleIndex using magic
-  angleIndex += int(pow(2, depth)) + angleIndex % depth;
+  angleIndex = 2 * (angleIndex + 1);
   
-  print(angleIndex);
-  
-  print("------");
-  
-  if (angleIndex > propagationAngles.length - 1) {
+  // Exit if reached the last layer of the array
+  if (pow(2, depth+1) > propagationAngles.length) {
     return;
   }
   else {
-    propagateLine(depth + 1, angleIndex, midX, midY);
-    propagateLine(depth + 1, angleIndex + 1, midX, midY);
+    propagateLine(compAngle, depth + 1, angleIndex, midX, midY);
+    propagateLine(compAngle, depth + 1, angleIndex+1, midX, midY);
   }
   
 }
@@ -54,12 +52,12 @@ void draw() {
   float x2 = lineCenterX + offsetX;
   float y2 = lineCenterY + offsetY;
   stroke(255);
-  line(x1, y1, x2, y2);
+  //line(x1, y1, x2, y2);
   
   if (propagationLevel != 0) {
     // Begin recursively drawing child lines from the main rotating line  
-    propagateLine(1, 0, lineCenterX-offsetX/2, lineCenterY-offsetY/2);
-    propagateLine(1, 0, lineCenterX+offsetX/2, lineCenterY+offsetY/2);
+    propagateLine(lineAngle, 1, 0, lineCenterX-offsetX/2, lineCenterY-offsetY/2);
+    //propagateLine(lineAngle, 1, 1, lineCenterX+offsetX/2, lineCenterY+offsetY/2);
   }
 }
 
@@ -69,7 +67,7 @@ void keyPressed() {
     if (keyCode == RIGHT) {
       propagationLevel += 1;
       for (int i = 0; i < pow(2, propagationLevel); i++) {
-        propagationAngles = append(propagationAngles, random(0, 2*PI));
+        propagationAngles = append(propagationAngles, random(minAngle, maxAngle));
       }
     }
     else if (keyCode == LEFT) {
