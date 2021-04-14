@@ -12,10 +12,11 @@
 
 // Configuration Values
 int treeDegree = 3;
-float initLength = 300;
-float[] treeCenter = {750, 500};
+float initLength = 500;
+float centerX = 750;
+float centerY = 500;
 float deltaAngle = PI / 256;
-float propDecay = 1.5;
+float propDecay = 1.3;
 float minAngle = 0.1*PI;
 float maxAngle = 0.3*PI;
 
@@ -24,7 +25,7 @@ float centerAngle = 0;
 int propagationLevel = 0;
 float[] propagationAngles = new float[treeDegree];
 
-Tree mainTree = new Tree(treeCenter, treeDegree, minAngle, maxAngle, initLength, propDecay);
+Tree mainTree = new Tree(treeDegree, minAngle, maxAngle, initLength, propDecay); 
 
 void setup() {
   size(1500, 1000, P2D);
@@ -32,17 +33,19 @@ void setup() {
 
 void draw() {
   background(0, 0, 0);
+  centerAngle -= deltaAngle;
   stroke(255);
-  mainTree.DrawTree(deltaAngle);
+  mainTree.StartDraw(centerAngle, centerX, centerY);
 }
 
 // Handler for key presses
 void keyPressed() { 
   if (key == CODED) { 
     if (keyCode == RIGHT) {
-      mainTree.Grow();
+      mainTree.Grow();      
     } else if (keyCode == LEFT) {
-      mainTree.Shrink();
+      // propagationAngles = propagationAngles[0:propagationAngles.length - pow(2, propagationLevel)];
+      return;
     } else if (keyCode == UP) {
       treeDegree += 1;
       propagationAngles = new float[treeDegree];
