@@ -1,23 +1,23 @@
-//  TODO:  Improve angle storage access; right now it is not possible for growth to be irregular
-//         Use Rotate, PushMatrix, and PopMatrix to rotate the tree - make sure to reduce drawing overhead as well  
+//  TODO:   Make proper constants
+//          Clean up code
+//          Improve angle storage access; right now it is not possible for growth to be irregular
 //
-//  Fixes: Correctly repopulate angle matrix on degree increase
-//
-//  Minor Improvements: Eliminate depth from DrawBranch - would it perform better/worse?
 //       
 //  IDEAS:  make it so when the propagation level is increased, there is only a chance that a branch will grow out of each existing one
 //          this makes the tree look much more organic since it will grow more in certain branches than others
 //
 //          then make it so the lines draw/pulse outwards, so only a layer of lines is visible at once
 
+
 // Configuration Values
 int treeDegree = 3;
 float initLength = 300;
 float[] treeCenter = {750, 500};
 float deltaAngle = PI / 256;
-float propDecay = 1.5;
+float propDecay = .8;
 float minAngle = 0.1*PI;
 float maxAngle = 0.3*PI;
+
 
 // Initial Values
 float centerAngle = 0;
