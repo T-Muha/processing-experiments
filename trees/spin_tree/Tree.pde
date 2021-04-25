@@ -7,16 +7,16 @@ public class Tree {
     private float x2;
     private float y2;
     private float theta;
-    private float length;
+    private float branchLength;
     
     // third angle parameter for initial branches at fixed angles
     Branch (float x, float y, float angle, float inLength) {
       x1 = x;
       y1 = y;
       theta = angle;
-      length = inLength;
-      x2 = x1 + length * cos(theta);
-      y2 = y1 + length * sin(theta);
+      branchLength = inLength;
+      x2 = x1 + branchLength * cos(theta);
+      y2 = y1 + branchLength * sin(theta);
     }
     
     void Draw () {
@@ -31,10 +31,10 @@ public class Tree {
     
     void Propagate() {
       if (children.length == 0) {
-        float attachX = x1 + length * propDecay * cos(theta);
-        float attachY = y1 + length * propDecay * sin(theta);
-        children = (Branch[]) append(children, new Branch(attachX, attachY, theta + random(minAngle, maxAngle), length * propDecay));
-        children = (Branch[]) append(children, new Branch(attachX, attachY, theta - random(minAngle, maxAngle), length * propDecay));
+        float attachX = x1 + branchLength * propDecay * cos(theta);
+        float attachY = y1 + branchLength * propDecay * sin(theta);
+        children = (Branch[]) append(children, new Branch(attachX, attachY, theta + random(minAngle, maxAngle), branchLength * propDecay));
+        children = (Branch[]) append(children, new Branch(attachX, attachY, theta - random(minAngle, maxAngle), branchLength * propDecay));
         return;
       }
       for (int i = 0; i < children.length; i++) {
@@ -59,20 +59,20 @@ public class Tree {
   float centerX, centerY;
   float[] branchCoords;
   int degree;
-  float minAngle, maxAngle;
-  float initLength;
-  float propDecay;
-  float propLevel = 0;
+  float minAngle = MIN_ANGLE;
+  float maxAngle = MAX_ANGLE;
+  float propDecay = PROP_DECAY;
   
   // Construct tree from parameters
-  Tree (float[] centerIn, int degIn, float minAngIn, float maxAngIn, float initLenIn, float propDecayIn) {
-    centerX = centerIn[0]; centerY = centerIn[1]; degree = degIn; minAngle = minAngIn;
-    maxAngle = maxAngIn; initLength = initLenIn; propDecay = propDecayIn;
+  Tree (float[] centerIn, int degreeIn, float initLenIn) {
+    centerX = centerIn[0];
+    centerY = centerIn[1];
+    degree = degreeIn;
     roots = new Branch[degree];
     for (int i = 0; i < degree; i ++) {
       // The base lines will be spaced at equal angles - same as in UP keypress
       float compAngle = 2*PI/degree*i;
-      roots[i] = new Branch(centerX, centerY, compAngle, initLength);
+      roots[i] = new Branch(centerX, centerY, compAngle, initLenIn);
     }
   }
   
@@ -87,7 +87,6 @@ public class Tree {
   
   // Increase the level of the tree
   void Grow() {
-    propLevel += 1;
     for (int i = 0; i < roots.length; i++) {
       roots[i].Propagate();
     }
@@ -103,20 +102,21 @@ public class Tree {
     return;
   }
   
-  // Increase the degree of the tree (number of initial branches)
-  void DegreeUp() {
-    return;
-  }
-  
-  // Decrease the degree of the tree
-  void DegreeDown() {
-    return;
-  }
-  
   // Rotates coord system around the given point
   void pRotate(float angle, float pCenterX, float pCenterY) {
     translate(pCenterX, pCenterY);
     rotate(angle);
     translate(-1*pCenterX, -1*pCenterY);
   }
+  
+  // TODO - Increase the degree of the tree (number of initial branches)
+  void DegreeUp() {
+    return;
+  }
+  
+  // TODO - Decrease the degree of the tree
+  void DegreeDown() {
+    return;
+  }
+  
 }
